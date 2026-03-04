@@ -28,15 +28,52 @@ namespace Shop.App
 
             if (context.Database.CanConnect())
             {
-                Console.WriteLine("Пiдключення до БД встановлено");
-                User user = new User();
-                user.Name = "Bob";
-                user.Surname = "Smith";
-                user.Email = "bob@gmail.com";
-                user.Role = UserRole.ADMIN;
-                user.HashPassword = BCrypt.Net.BCrypt.EnhancedHashPassword("qwerty");
-                context.Users.Add(user);
-                context.SaveChanges();
+                //var product = new Product
+                //{
+                //    Name = "булочка",
+                //    Price = 39.6m,
+                //    CreatedAt = DateTime.Now
+                //};
+                //var productCategory = new CategoryProduct
+                //{
+                //    ProductId = 4,
+                //    CategoryId=2,
+                //    Store = 16
+                //};
+                //context.Add(productCategory);
+                //context.SaveChanges();
+
+                //SEEDERS
+                //var product = new Product
+                //{
+                //    Name = "батон",
+                //    Price = 22.6m,
+                //    CreatedAt = DateTime.Now
+                //};
+                //var category = new Category
+                //{
+                //    Name = "хлібобулочні вироби",
+                //    CreatedAt = DateTime.Now
+                //};
+                //var productCategory = new CategoryProduct
+                //{
+                //    Product = product,
+                //    CategoryId = 2,
+                //    Store = 20
+                //};
+                //context.Add(productCategory);
+                //context.SaveChanges();
+
+
+                //Console.WriteLine("Пiдключення до БД встановлено");
+                //User user = new User();
+                //user.Name = "Bob";
+                //user.Surname = "Smith";
+                //user.Email = "bob@gmail.com";
+                //user.Role = UserRole.ADMIN;
+                //user.HashPassword = BCrypt.Net.BCrypt.EnhancedHashPassword("qwerty");
+                //context.Users.Add(user);
+                //context.SaveChanges();
                 //string email = "alex@gmail.com";
                 //string password = "qwerty2";
                 //var user = context.Users.FirstOrDefault(u => u.Email == email);

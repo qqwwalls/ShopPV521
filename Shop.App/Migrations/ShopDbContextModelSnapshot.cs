@@ -42,6 +42,24 @@ namespace Shop.App.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Shop.Domain.Entities.CategoryProduct", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Store")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("CategoryProducts");
+                });
+
             modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -49,9 +67,6 @@ namespace Shop.App.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -64,8 +79,6 @@ namespace Shop.App.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
                 });
@@ -105,20 +118,33 @@ namespace Shop.App.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
+            modelBuilder.Entity("Shop.Domain.Entities.CategoryProduct", b =>
                 {
                     b.HasOne("Shop.Domain.Entities.Category", "Category")
-                        .WithMany("Products")
+                        .WithMany("CategoryProducts")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Shop.Domain.Entities.Product", "Product")
+                        .WithMany("CategoryProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Category");
+
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Shop.Domain.Entities.Category", b =>
                 {
-                    b.Navigation("Products");
+                    b.Navigation("CategoryProducts");
+                });
+
+            modelBuilder.Entity("Shop.Domain.Entities.Product", b =>
+                {
+                    b.Navigation("CategoryProducts");
                 });
 #pragma warning restore 612, 618
         }

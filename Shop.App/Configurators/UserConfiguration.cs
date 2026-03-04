@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Shop.App.Configurators;
 
-public class ConfigurationUser : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
