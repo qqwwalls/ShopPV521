@@ -13,12 +13,18 @@ public class CategoryProductConfiguration : IEntityTypeConfiguration<CategoryPro
 {
     public void Configure(EntityTypeBuilder<CategoryProduct> builder)
     {
+        builder.ToTable("CategoryProducts");
+
         builder.HasKey(cp => new { cp.ProductId, cp.CategoryId });
+
+        builder.Property(cp => cp.Store)
+            .HasDefaultValue(0);
 
         builder
             .HasOne(cp => cp.Product)
             .WithMany(p => p.CategoryProducts)
             .HasForeignKey(cp => cp.ProductId);
+
         builder
             .HasOne(cp => cp.Category)
             .WithMany(c => c.CategoryProducts)
