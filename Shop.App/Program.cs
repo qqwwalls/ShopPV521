@@ -1,43 +1,30 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Shop.Domain.Data;
+using Microsoft.Extensions.DependencyInjection;
+using Shop.App;
 using Shop.App.Services;
-using System;
-using System.Collections.Generic;
+using Shop.Domain.Data;
+using Shop.Domain.Interfaces;
+using Shop.Domain.Repositories;
 using System.IO;
-using System.Linq;
 
-var builder = new ConfigurationBuilder()
+IConfigurationBuilder configBuilder = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-IConfiguration configuration = builder.Build();
+IConfiguration configuration = configBuilder.Build();
+string connectionString = configuration.GetConnectionString("MSSQLConnection") ?? throw new Exception("Connection string not found");
 
-string? connectionString = configuration.GetConnectionString("MSSQLConnection");
+ServiceCollection serviceCollection = new ServiceCollection();
 
-if (string.IsNullOrEmpty(connectionString))
-{
-    Console.WriteLine("Error: Connection string 'MSSQLConnection' not found in appsettings.json");
-    return;
-}
+serviceCollection.AddDbContext<ShopDbContext>(opt => 
+    opt.UseSqlServer(connectionString));
 
-var optionsBuilder = new DbContextOptionsBuilder<ShopDbContext>();
-optionsBuilder.UseSqlServer(connectionString);
+serviceCollection.AddScoped<IProductRepository, ProductRepository>();
+serviceCollection.AddScoped<ProductService>();
+serviceCollection.AddScoped<ShopManager>();
 
-using (var context = new ShopDbContext(optionsBuilder.Options))
-{
-    var orderService = new OrderService(context);
+ServiceProvider services = serviceCollection.BuildServiceProvider();
 
-    var testUser = context.Users.FirstOrDefault();
-    var testProducts = context.Products.Take(2).Select(p => p.Id).ToList();
-
-    if (testUser != null && testProducts.Any())
-    {
-        orderService.CreateOrder(testUser.Id, testProducts);
-        Console.WriteLine("Order created successfully!");
-    }
-    else
-    {
-        Console.WriteLine("Database is empty. Please add at least one User and one Product first.");
-    }
-}
+ShopManager manager = services.GetRequiredService<ShopManager>();
+manager.Run();
