@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Shop.Domain.Data;
 namespace Shop.App.Data;
 
 public class ShopDbContextFactory: IDesignTimeDbContextFactory<ShopDbContext>

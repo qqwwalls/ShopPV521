@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shop.App.Data;
-
+using Shop.Domain.Data;
 #nullable disable
 
 namespace Shop.App.Migrations
