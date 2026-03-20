@@ -1,8 +1,9 @@
+using Microsoft.EntityFrameworkCore.Storage;
+using Shop.Domain.Data;
+using Shop.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Shop.Domain.Data;
-using Shop.Domain.Entities;
 
 namespace Shop.App.Services
 {
@@ -15,42 +16,48 @@ namespace Shop.App.Services
             _context = context;
         }
 
-        public void CreateOrder(int userId, List<int> productIds)
+        public void CreateOrder(int userId, List<(int ProductId, int Quantity)> items)
         {
-            var user = _context.Users.Find(userId);
-            if (user == null) return;
-
-            var order = new Order
+            using IDbContextTransaction transaction = _context.Database.BeginTransaction();
+            try
             {
-                UserId = userId,
-                OrderDate = DateTime.UtcNow,
-                Status = "New",
-                TotalAmount = 0
-            };
-
-            _context.Orders.Add(order);
-            _context.SaveChanges();
-
-            decimal total = 0;
-            foreach (var productId in productIds)
-            {
-                var product = _context.Products.Find(productId);
-                if (product != null)
+                var order = new Order
                 {
+                    UserId = userId,
+                    OrderDate = DateTime.UtcNow,
+                    Status = "Processing",
+                    TotalAmount = 0
+                };
+                _context.Orders.Add(order);
+                _context.SaveChanges();
+
+                decimal total = 0;
+                foreach (var item in items)
+                {
+                    var product = _context.Products.Find(item.ProductId);
+                    if (product == null) throw new Exception("Product not found");
+                    if (product.StockQuantity < item.Quantity) throw new Exception("Low stock");
+
+                    product.StockQuantity -= item.Quantity;
                     var orderItem = new OrderItem
                     {
                         OrderId = order.Id,
-                        ProductId = productId,
-                        Quantity = 1,
+                        ProductId = product.Id,
+                        Quantity = item.Quantity,
                         Price = product.Price
                     };
-                    total += product.Price;
+                    total += product.Price * item.Quantity;
                     _context.OrderItems.Add(orderItem);
                 }
+                order.TotalAmount = total;
+                _context.SaveChanges();
+                transaction.Commit();
             }
-
-            order.TotalAmount = total;
-            _context.SaveChanges();
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }
