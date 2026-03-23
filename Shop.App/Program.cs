@@ -22,9 +22,16 @@ serviceCollection.AddDbContext<ShopDbContext>(opt =>
 
 serviceCollection.AddScoped<IProductRepository, ProductRepository>();
 serviceCollection.AddScoped<ProductService>();
+serviceCollection.AddScoped<ProductSeeder>();
 serviceCollection.AddScoped<ShopManager>();
 
 ServiceProvider services = serviceCollection.BuildServiceProvider();
 
-ShopManager manager = services.GetRequiredService<ShopManager>();
-manager.Run();
+using (IServiceScope scope = services.CreateScope())
+{
+    ProductSeeder seeder = scope.ServiceProvider.GetRequiredService<ProductSeeder>();
+    await seeder.SeedAndBenchmarkAsync();
+
+    ShopManager manager = scope.ServiceProvider.GetRequiredService<ShopManager>();
+    manager.Run();
+}
